@@ -1,19 +1,21 @@
+
 $.getScript("js/xlsx.full.min.js",function(){
 	
-	// calculation counts\
-	var count = 0;
-	var type = 'origin';
+	// calculation counts
 	
-	if(type == "origin"){
-		count = 1;
-	}else if(type = "adjustment"){
+	var count = 1;
+	if(vcount >0){
 		count = 2;
-	}else if(type = "optimize"){
-		count = 101;
 	}
-	
-	// get parameters
-	var paras = '';
+
+//	
+//	if(type == "origin"){
+//		count = 1;
+//	}else if(type = "adjustment"){
+//		count = 2;
+//	}else if(type = "optimize"){
+//		count = 101;
+//	}
 	
 	/* set up XMLHttpRequest */
 	var url = "data.xlsx";
@@ -69,21 +71,42 @@ $.getScript("js/xlsx.full.min.js",function(){
 		var sale_cal = 0;
 		var baseline = 0;
 		
+		
+		
+		
 		for(var c = 0; c<count; c++){
+			
 			//column
 			var mediamixtotal = 0;
+			contribution_cal =[];
+			data_json_cal = [];
+			baseline = 0;
+			sale_cal = 0;
 			if(c==0){
 				data_json_cal = data_json_ori.slice(0);
-			}else if(type == "adjustment"){
-				for(var i=1; i<data_json_result.length;i++){
-					for(var j=0; j<variable_arr.length;j++){
-						data_json_cal[i][j+3] = paras[j]*data_json_ori[i][j+3]/contribution_ori[j];
+			}else if(sum != 100){
+						alert("The sum of percentages is not 100. Please check check and retype them.");
+				}else{
+				for(var i=0; i<data_json_ori.length;i++){
+					
+					var temp = [];
+					
+					for(var k = 0; k<3;k++){
+						temp.push(data_json_ori[i][k]);
 					}
+					for(var j=0; j<variable_arr.length;j++){
+						if(i==0){
+							temp.push(data_json_ori[i][j+3]);
+						}else{
+							temp.push(paras[j]*data_json_ori[i][j+3]/media_mix_ori[j]);
+						}
+						
+						//data_json_cal[i][j+3] = paras[j]*data_json_ori[i][j+3]/contribution_ori[j];
+					}
+					
+					data_json_cal.push(temp);
 				}
-			}else{
-				//randomly generate parameters to get media mix
 			}
-			
 			
 			for(var i = 0; i<=variable_arr.length; i++){
 				var sub_contribution = 0;
@@ -111,9 +134,13 @@ $.getScript("js/xlsx.full.min.js",function(){
 					media_mix_ori.push(sub_total);
 					mediamixtotal += sub_total;
 				}else{
-					contribution_cal.push(sub_contribution);
-					sale_cal += sub_contribution;
+					if(i!=variable_arr.length){
+						contribution_cal.push(sub_contribution);
+						sale_cal += sub_contribution;
+					}
+					
 				}
+					console.log(sub_contribution);
 				
 			}
 			
@@ -121,22 +148,74 @@ $.getScript("js/xlsx.full.min.js",function(){
 			if(c == 0){
 					sale_ori += baseline;
 					for(var k = 0; k < media_mix_ori.length; k++){
-						media_mix_ori[k] = Number(Math.round(media_mix_ori[k]*100/mediamixtotal + 'e1') + 'e-1');
+						media_mix_ori[k] = media_mix_ori[k]*100/mediamixtotal;
 					}
 				}else{
 					sale_cal += baseline;
 				}
+			console.log(baseline);
+
+		}
+
+
+		
+		// draw table
+		
+		var table = document.getElementById("myTable");
+		var content = "";
+		if(c == 0){
+			// initialize table content
+			content += "<tr><td>Impact</td>";
+			for(var i = 0; i<variable_arr.length;i++){
+				content += "<td>" + variable_arr[i] + "</td>";
+			}
+			content += "<td>Sales</td>";
+			content += "</tr><tr><td>Media Mix</td>";
+			for(var i=0; i<media_mix_ori.length; i++){
+				content += "<td>" + Number(Math.round(media_mix_ori[i] + 'e1') + 'e-1') + "&#37;</td>";
+			}
+			content += "</tr><tr><td>Contribution</td>";
+			for(var i = 0; i<contribution_ori.length;i++){
+				content += "<td>" + Math.round(contribution_ori[i]) + "</td>";
+			}
+			content += "<td>" + Math.round(sale_ori) + "</td>";
+			content += "</tr>";
+			
+			rowinfo = content.slice();
+		}else{
+			content += rowinfo;
+			if(sum == 100){
+				content += "<tr><td>Media Mix</td>";
+				for(var i=0; i<paras.length;i++){
+					content += "<td>" + Number(Math.round(paras[i] + 'e1') + 'e-1') + "&#37;</td>";
+				}
+				content += "</tr><tr><td>Contribution</td>";
+				for(var i = 0; i<contribution_cal.length;i++){
+					content += "<td>" + Math.round(contribution_cal[i]) + "</td>";
+				}
+				content += "<td>" + Math.round(sale_cal) + "</td>";
+				content += "</tr>";
+
+				rowinfo = content.slice();
+			}
 			
 		}
 		
 
-		console.log(data_json_ori);
-		console.log(data_json_cal);
-		console.log(baseline);
-		console.log(mediamixtotal);
-		console.log(media_mix_ori);
-		console.log(sale_ori);
-		console.log(contribution_ori);
+		// add input fields
+		content += "<tr>";
+		content += "<td>Adjust Media Mix(&#37;):</td>";
+		for(var i=0; i<variable_arr.length; i++){
+			content += '<td><input type = "number" name=' +variable_arr[i]+' id = '+variable_arr[j]+' value=""/></td>'; 
+		}
+		content += "</tr>";
+		
+		
+		
+		
+		table.innerHTML = content;
+		document.getElementById("rowinfo").value =rowinfo;
+		
 	}
 
 	oReq.send();
