@@ -2,7 +2,6 @@
 	$vcount = count($_GET);
 	$rowinfo = $_GET["rowinfo"];
 	$para=[];
-
 	if($vcount > 0) {
     foreach($_GET as $key => $value) {
 		if($key == "rowinfo"){
@@ -30,13 +29,12 @@
 	<form action="#" method="GET">
 	<p><table id="myTable"></table></p>
 	<input type="hidden" name="rowinfo" id="rowinfo"/>
-	<p><input type="submit" value="GENERATE"/><button type="button" id="optimize">OPTIMIZE</button></p>
-	</form>
+	<input type="submit" value="GENERATE"/>
+	</form><button type="button" id="optimize">OPTIMIZE</button>
 </div>
 <hr>
 <!--
 <div id="container">
-
 	<form action="#" method="POST">
 		<p>Input floating range of contributions:  &#177;<input type="number" name="floatrange" id="floatrange"/>&#37;</p>
 		<p><input type="submit" name="floatrangesubmit" id="floatrangesubmit" value="Optimize"/></p>

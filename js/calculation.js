@@ -1,4 +1,3 @@
-
 $.getScript("js/xlsx.full.min.js",function(){
 	
 	// calculation counts
@@ -73,9 +72,7 @@ $.getScript("js/xlsx.full.min.js",function(){
 		
 		
 		
-		
 		for(var c = 0; c<count; c++){
-			
 			//column
 			var mediamixtotal = 0;
 			contribution_cal =[];
@@ -144,6 +141,7 @@ $.getScript("js/xlsx.full.min.js",function(){
 				
 			}
 			
+			
 			// get sales
 			if(c == 0){
 					sale_ori += baseline;
@@ -156,14 +154,13 @@ $.getScript("js/xlsx.full.min.js",function(){
 			console.log(baseline);
 
 		}
-
-
+		console.log(c);
 		
 		// draw table
 		
 		var table = document.getElementById("myTable");
 		var content = "";
-		if(c == 0){
+		if(c == 1){
 			// initialize table content
 			content += "<tr><td>Impact</td>";
 			for(var i = 0; i<variable_arr.length;i++){
@@ -193,7 +190,12 @@ $.getScript("js/xlsx.full.min.js",function(){
 				for(var i = 0; i<contribution_cal.length;i++){
 					content += "<td>" + Math.round(contribution_cal[i]) + "</td>";
 				}
-				content += "<td>" + Math.round(sale_cal) + "</td>";
+				var change = Number(Math.round((sale_cal-sale_ori)*100/sale_ori + 'e2') + 'e-2');
+				var sign = "+";
+				if(change<0){
+					sign ="-";
+				}
+				content += "<td>" + Math.round(sale_cal) +"("+sign+change+"&#37;)"+ "</td>";
 				content += "</tr>";
 
 				rowinfo = content.slice();
@@ -220,5 +222,3 @@ $.getScript("js/xlsx.full.min.js",function(){
 
 	oReq.send();
 });
-
-
