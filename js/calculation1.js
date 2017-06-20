@@ -17,7 +17,7 @@ $.getScript("js/xlsx.full.min.js",function(){
 //	}
 	
 	/* set up XMLHttpRequest */
-	var url = "data.xlsx";
+	var url = "upload.xlsx";
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", url, true);
 	oReq.responseType = "arraybuffer";
@@ -105,24 +105,35 @@ $.getScript("js/xlsx.full.min.js",function(){
 				}
 			}
 			
+			
+			console.log(data_json_cal);
+			console.log(paras);
+			console.log(media_mix_ori);
+			// i is column
 			for(var i = 0; i<=variable_arr.length; i++){
 				var sub_contribution = 0;
 				var sub_total = 0;
+				// j is row
+
 				for(var j = 1; j<data_json_cal.length;j++){
 					if(i == variable_arr.length){
 						//calculate baseline
 						baseline += data_json_cal[j][1];
 					}else{
-						var data = data_json_cal[j][i+3];
-						var coefficient = coefficient_json_ori[0][variable_arr[i]];
-						var power = power_json_ori[0][variable_arr[i]];
-						var temp_con = coefficient*Math.pow(data,power);
-						sub_contribution += temp_con;
 						if(c == 0){
 							var conversion = conversion_json_ori[0][variable_arr[i]];
 							var temp = conversion * data_json_cal[j][i+3];
 							sub_total += temp;
 						}
+						if(j >= (data_json_cal.length - lag_json_ori[0][variable_arr[i]])){
+							continue;
+						}
+						var data = data_json_cal[j][i+3];
+						var coefficient = coefficient_json_ori[0][variable_arr[i]];
+						var power = power_json_ori[0][variable_arr[i]];
+						var temp_con = coefficient*Math.pow(data,power);
+						sub_contribution += temp_con;
+						
 					}
 				}
 				if(c == 0 && i != variable_arr.length){
@@ -137,7 +148,7 @@ $.getScript("js/xlsx.full.min.js",function(){
 					}
 					
 				}
-					console.log(sub_contribution);
+
 				
 			}
 			
@@ -151,10 +162,10 @@ $.getScript("js/xlsx.full.min.js",function(){
 				}else{
 					sale_cal += baseline;
 				}
-			console.log(baseline);
+
 
 		}
-		console.log(c);
+
 		
 		// draw table
 		

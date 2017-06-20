@@ -30,7 +30,8 @@
 	<p><table id="myTable"></table></p>
 	<input type="hidden" name="rowinfo" id="rowinfo"/>
 	<input type="submit" value="GENERATE"/>
-	</form><button type="button" id="optimize">OPTIMIZE</button>
+		<button type="submit" id="optimize">OPTIMIZE</button>
+	</form>
 </div>
 <hr>
 <!--
@@ -82,6 +83,6 @@
         return ret;
 }
 </script>
-<script src="js/calculation.js"></script>
+<script src="js/calculation1.js"></script>
 </body>
 </html>
