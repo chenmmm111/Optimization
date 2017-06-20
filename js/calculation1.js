@@ -219,7 +219,7 @@ $.getScript("js/xlsx.full.min.js",function(){
 		content += "<tr>";
 		content += "<td>Adjust Media Mix(&#37;):</td>";
 		for(var i=0; i<variable_arr.length; i++){
-			content += '<td><input type = "number" name=' +variable_arr[i]+' id = '+variable_arr[j]+' value=""/></td>'; 
+			content += '<td><input type = "number" name=' +variable_arr[i]+' id = '+variable_arr[i]+' value=""/></td>'; 
 		}
 		content += "</tr>";
 		

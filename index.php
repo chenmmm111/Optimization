@@ -10,7 +10,7 @@
 <h2>Media Mix Optimization</h2>
 <hr>
 <div id="container">
-	<form action="#" method="GET">
+	<form action="#" method="GET" id = "myForm">
 	<p><table id="myTable"></table></p>
 	<button type="button" id="generate">GENERATE</button>
 	<button type="button" id="optimize">OPTIMIZE</button>
