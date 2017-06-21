@@ -58,7 +58,7 @@ $.getScript("js/xlsx.full.min.js",function(){
 		createTable(media_mix_ori, contribution_ori, variable_arr, sale_ori);
 		addInputArea(variable_arr);
 		//var contribution_ori_per = calContriPer(contribution_ori, sale_ori, baseline);
-								console.log(data_json_ori);
+
 		document.getElementById("generate").onclick = function(){
 			// check whether the values are set and equals to 100
 			var input = checkValue(variable_arr);
@@ -66,7 +66,7 @@ $.getScript("js/xlsx.full.min.js",function(){
 				//reload original data
 				data_json_ori = XLSX.utils.sheet_to_json(worksheet1,{raw:true, header:1});
 				var new_data_arr = getNewOriData(data_json_ori, input, media_mix_ori);
-				console.log(data_json_ori);
+
 				var new_contri_arr = calContribution(new_data_arr, coefficient_json_ori, power_json_ori, lag_json_ori, variable_arr);
 				var new_sale = calSale(new_contri_arr, baseline);
 				addrow(input, new_contri_arr, new_sale, sale_ori);
@@ -78,7 +78,41 @@ $.getScript("js/xlsx.full.min.js",function(){
 			}else{
 				alert("The contributions should sum up to 100! Please try again.");
 			}
-		}
+		};
+		
+		document.getElementById("optimize").onclick = function(){
+			data_json_ori = XLSX.utils.sheet_to_json(worksheet1,{raw:true, header:1});
+			var varplus = plus_json_ori[0]["varplus"];
+			var budgetplus = plus_json_ori[0]["budgetplus"];
+			
+			if(varplus && budgetplus && varplus<1 && varplus>0 && budgetplus <1 && budgetplus>0){
+				var round = 0;
+				var optimize_contri = [];
+				var optimize_media_mix = [];
+				var optimize_sale = 0;
+				do{
+					//reload original data
+					data_json_ori = XLSX.utils.sheet_to_json(worksheet1,{raw:true, header:1});
+					var random_media_mix =  getRandomMediaMix(media_mix_ori, varplus);
+					var random_data_arr = getNewOriData(data_json_ori, random_media_mix, media_mix_ori);
+					var random_contri_arr = calContribution(random_data_arr, coefficient_json_ori, power_json_ori, lag_json_ori, variable_arr);
+					var random_sale = calSale(random_contri_arr, baseline);
+					if(random_sale>optimize_sale){
+						optimize_contri = random_contri_arr.slice(0);
+						optimize_media_mix = random_media_mix.slice(0);
+						optimize_sale = random_sale;
+					}
+					round++;
+				}
+				while(round<5000);
+			
+				console.log(optimize_media_mix,optimize_sale);
+				
+				
+			}else{
+				alert("Wrong varplus or budgetplus in source excel file. (0,1)");
+			}
+		};
 	
 	};
 	
@@ -238,12 +272,28 @@ function addrow(media_mix_arr, contribution_arr, sale, sale_ori){
 	row2.insertCell(contribution_arr.length+1).innerHTML = Math.round(sale) + "(" + sign + change + "&#37;)";
 }
 
+function getRandomMediaMix(media_mix_ori_arr, varplus){
+	var random_media_mix = media_mix_ori_arr.slice(0);
+	// get a new reasonable media mix
+	var last_media = random_media_mix[random_media_mix.length-1];
+	var last_media_max = last_media * (1+varplus);
+	var last_media_min = last_media * (1-varplus);
+	do{
+			var sub_sum = 0;
+			for(var i=0; i<media_mix_ori_arr.length-1;i++){
 
-//function calContriPer(contribution_arr, sale, baseline){
-//	var contri_per_arr = [];
-//	var sum = sale-baseline;
-//	for(var i=0; i<contribution_arr.length; i++){
-//		contri_per_arr.push(contribution_arr[i]*100/sum);
-//	}
-//	return contri_per_arr;
-//}
+				do{
+					random_media_mix[i] = random_media_mix[i] * (1 - varplus + 2 * varplus * Math.random());
+				}
+				while(random_media_mix[i]>1);
+				sub_sum += random_media_mix[i];
+			}
+
+		//get the last media variable
+			random_media_mix[media_mix_ori_arr.length-1] = 1 - sub_sum;
+	}
+	while(last_media > 1||last_media<0 ||last_media>last_media_max||last_media<last_media_min);
+	
+	return random_media_mix;
+}
+
