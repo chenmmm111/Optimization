@@ -57,12 +57,14 @@ $.getScript("js/xlsx.full.min.js",function(){
 		var sale_ori = calSale(contribution_ori,baseline);
 		createTable(media_mix_ori, contribution_ori, variable_arr, sale_ori);
 		addInputArea(variable_arr);
-		//var contribution_ori_per = calContriPer(contribution_ori, sale_ori, baseline);
-
+		// add a column
+		drawAColumn("ori", "Original", "", contribution_ori, variable_arr);
+		var countGenerate = 0;
 		document.getElementById("generate").onclick = function(){
 			// check whether the values are set and equals to 100
 			var input = checkValue(variable_arr);
 			if(input){
+				countGenerate++;
 				//reload original data
 				data_json_ori = XLSX.utils.sheet_to_json(worksheet1,{raw:true, header:1});
 				var new_data_arr = getNewOriData(data_json_ori, input, media_mix_ori);
@@ -72,8 +74,15 @@ $.getScript("js/xlsx.full.min.js",function(){
 				addrow(input, new_contri_arr, new_sale, sale_ori);
 				//reset fields
 				document.getElementById("myForm").reset();
-				
-				
+				var text="Scenario "+countGenerate;
+				var type="s"+ countGenerate;
+				var change = new_sale - sale_ori;
+				//draw the column
+				drawAColumn(type, text, Math.round(change), contribution_ori, variable_arr);
+				console.log(countGenerate);
+				if(countGenerate > 2){
+					document.getElementById("generate").disabled = true;
+				}
 				
 			}else{
 				alert("The contributions should sum up to 100! Please try again.");
@@ -208,7 +217,7 @@ function createTable(media_mix_arr, contribution_arr, variable_arr, sale_ori){
 
 function addInputArea(variable_arr){
 	var table = document.getElementById("myTable");
-	var tr = document.getElementsByTagName("tr").length;
+	var tr = document.getElementsByTagName("tr").length - 4;
 	var row = table.insertRow(tr);
 	var cell1 = row.insertCell(0);
 	cell1.innerHTML = "Adjust Media Mix(&#37;):";
@@ -249,7 +258,7 @@ function getNewOriData(ori_data_arr, new_media_mix_arr, old_media_mix_arr){
 
 function addrow(media_mix_arr, contribution_arr, sale, sale_ori){
 	var table = document.getElementById("myTable");
-	var tr = document.getElementsByTagName("tr").length;
+	var tr = document.getElementsByTagName("tr").length - 4;
 	var row1 = table.insertRow(tr-1);
 	row1.insertCell(0).innerHTML = "Media Mix";
 	for(var i=0 ; i<contribution_arr.length; i++){
@@ -297,3 +306,48 @@ function getRandomMediaMix(media_mix_ori_arr, varplus){
 	return random_media_mix;
 }
 
+function drawAColumn(type, text, change, contribution_arr, variable_arr){
+	var up = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" width="20px" height="20px" viewBox="0 0 292.362 292.362" style="enable-background:new 0 0 292.362 292.362;" xml:space="preserve"><g><path d="M286.935,197.286L159.028,69.379c-3.613-3.617-7.895-5.424-12.847-5.424s-9.233,1.807-12.85,5.424L5.424,197.286   C1.807,200.9,0,205.184,0,210.132s1.807,9.233,5.424,12.847c3.621,3.617,7.902,5.428,12.85,5.428h255.813   c4.949,0,9.233-1.811,12.848-5.428c3.613-3.613,5.427-7.898,5.427-12.847S290.548,200.9,286.935,197.286z" fill="#D80027"/></g></svg>';
+	var down = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" width="20px" height="20px" viewBox="0 0 292.362 292.362" style="enable-background:new 0 0 292.362 292.362;" xml:space="preserve"><g><path d="M286.935,69.377c-3.614-3.617-7.898-5.424-12.848-5.424H18.274c-4.952,0-9.233,1.807-12.85,5.424  C1.807,72.998,0,77.279,0,82.228c0,4.948,1.807,9.229,5.424,12.847l127.907,127.907c3.621,3.617,7.902,5.428,12.85,5.428   s9.233-1.811,12.847-5.428L286.935,95.074c3.613-3.617,5.427-7.898,5.427-12.847C292.362,77.279,290.548,72.998,286.935,69.377z" fill="#91DC5A"/></g></svg>';
+	var elements=["-text","-sign","-sale","-graph"];
+	for(var i=0; i<4;i++){
+		elements[i] = type + elements[i];
+	}
+	document.getElementById(elements[0]).innerHTML = text;
+	if(change < 0){
+		document.getElementById(elements[1]).innerHTML = down;
+	}else if(change > 0){
+		document.getElementById(elements[1]).innerHTML = up;
+	}else{
+		document.getElementById(elements[1]).innerHTML = "";
+	}
+	document.getElementById(elements[2]).innerHTML = change;
+	
+	//get data format
+	var data = [];
+	for(var i=0;i<variable_arr.length; i++){
+		var dps = [];
+		dps.push({y:contribution_arr[i],lable:variable_arr[i]});
+		data.push({bevelEnabled: false, type:"stackedColumn",dataPoints:dps});
+	}
+	var para = {data:data};
+	var chart = new CanvasJS.Chart(elements[3],para);
+	chart.render();
+}
+
+//var data = [];
+//var dps1 = [];
+//var dps2 = [];
+//var variable1 = "v1";
+//var sale1 = 1000;
+//var variable2 = "v2";
+//var sale2 = 100;
+//dps1.push({y:sale1,lable:variable1});
+//dps2.push({y:sale2,lable:variable2});
+//data.push({type:"stackedColumn",dataPoints:dps1});
+//data.push({type:"stackedColumn",dataPoints:dps2});
+//var para = {data:data};
+//
+//var c1 = new CanvasJS.Chart("s1-graph",para);
+//c1.render();
+	
