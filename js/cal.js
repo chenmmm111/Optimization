@@ -99,6 +99,9 @@ $.getScript("js/xlsx.full.min.js",function(){
 				var optimize_contri = [];
 				var optimize_media_mix = [];
 				var optimize_sale = 0;
+				var plus_media_mix = [];
+				var plus_contri = [];
+				var plus_sale = 0;
 				do{
 					//reload original data
 					data_json_ori = XLSX.utils.sheet_to_json(worksheet1,{raw:true, header:1});
@@ -115,7 +118,18 @@ $.getScript("js/xlsx.full.min.js",function(){
 				}
 				while(round<5000);
 			
-				console.log(optimize_media_mix,optimize_sale);
+				console.log(optimize_media_mix,optimize_sale,optimize_contri);
+				for(var i=0; i<optimize_media_mix.length;i++){
+					plus_media_mix.push(optimize_media_mix[i]);
+				}
+				var plus_data_arr = getNewOriData(data_json_ori, plus_media_mix, media_mix_ori);
+				plus_contri = calContribution(plus_data_arr, coefficient_json_ori, power_json_ori, lag_json_ori, variable_arr);
+				plus_sale = calSale(plus_contri, baseline);
+				
+				addrow(optimize_media_mix, optimize_contri, optimize_sale, sale_ori);
+				addrow(plus_media_mix, plus_contri, plus_sale, sale_ori);
+				drawAColumn("op", "Optimize", Math.round(optimize_sale - sale_ori), optimize_contri, variable_arr);
+				drawAColumn("bud", "BudgetPlus", Math.round(plus_sale - sale_ori), plus_contri, variable_arr);
 				
 				
 			}else{
@@ -327,10 +341,31 @@ function drawAColumn(type, text, change, contribution_arr, variable_arr){
 	var data = [];
 	for(var i=0;i<variable_arr.length; i++){
 		var dps = [];
-		dps.push({y:contribution_arr[i],lable:variable_arr[i]});
-		data.push({bevelEnabled: false, type:"stackedColumn",dataPoints:dps});
+		contribution_arr[i] = Number(Math.round(contribution_arr[i] + 'e0') + 'e-0');
+		dps.push({y:contribution_arr[i],label:text});
+		data.push({bevelEnabled: false, type:"stackedColumn",name:variable_arr[i], dataPoints:dps});
 	}
-	var para = {data:data};
+	var para = {
+			axisY:{
+				labelFontSize: 0,
+		        labelMaxWidth: 0,
+		        tickLength: 0,
+		        lineThickness: 0,
+		        gridThickness: 0
+		      },
+		    axisX:{
+			    labelFontSize: 0,
+			    labelMaxWidth: 0,
+			    tickLength: 0,
+			    lineThickness: 0,
+			    gridThickness: 0
+			  },
+			toolTip: {
+			        shared: true,
+			        //animationEnabled: true
+			  },
+			data:data
+	};
 	var chart = new CanvasJS.Chart(elements[3],para);
 	chart.render();
 }
