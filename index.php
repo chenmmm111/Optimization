@@ -4,35 +4,38 @@
 <head>
 <meta charset="UTF-8">
 <title>Optimization Tool</title>
-<style>
-    .canvasjs-chart-credit {
-   		display: none;
-	}
-    </style>
+<link rel = "stylesheet"
+   type = "text/css"
+   href = "css/style.css" />
 </head>
 
 <body>
-<h1>Publicis Media</h1>
-<h2>Media Mix Optimization</h2>
-<hr>
+ <a href="/"><img src="icon/PublicisGreaterChina_308x57.png" alt="Publicis Greater China Logo" /></a>
+<h1>Media Mix Optimization</h1>
+
 <div id="container">
 	<form action="#" method="GET" id = "myForm">
-	<p><table id="myTable"></table></p>
-	<button type="button" id="generate">GENERATE</button>
-	<button type="button" id="optimize">OPTIMIZE</button>
+	<p><table class="table1" id="myTable" style="width: 100%"></table></p>
+	<button type="button" id="generate" class="btn">GENERATE</button>
+	<button type="button" id="optimize" class="btn" disabled="disabled">OPTIMIZE</button>
+	
 	</form>
 </div>
-
+<br>
+<br>
 <div style="width: 100%">
-	<table id="displayTable">
+	<table id="displayTable" style="width:100%">
+	<thead>
 		<tr>
-			<td id="ori-text" style="width:17%" align="center"></td>
-			<td id="s1-text" style="width:17%" align="center"></td>
-			<td id="s2-text" style="width:17%" align="center"></td>
-			<td id="s3-text" style="width:17%" align="center"></td>
-			<td id="op-text" style="width:17%" align="center"></td>
-			<td id="bud-text" style="width:17%" align="center"></td>
+			<th id="ori-text" style="width:17%" align="center"></th>
+			<th id="s1-text" style="width:17%" align="center"></th>
+			<th id="s2-text" style="width:17%" align="center"></th>
+			<th id="s3-text" style="width:17%" align="center"></th>
+			<th id="op-text" style="width:17%" align="center"></th>
+			<th id="bud-text" style="width:17%" align="center"></th>
 		</tr>
+	</thead>
+	<tbody>
 		<tr>
 			<td id="ori-sign" align="center"></td>
 			<td id="s1-sign" align="center"></td>
@@ -56,10 +59,11 @@
 			<td><div id="s3-graph" style="height: 400px; width: 100%;"></div></td>
 			<td><div id="op-graph" style="height: 400px; width: 100%;"></div></td>
 			<td><div id="bud-graph" style="height: 400px; width: 100%;"></div></td>
-		</tr>		
+		</tr>
+	</tbody>		
 	</table>
 </div>
-<hr>
-<script src="js/cal.js"></script>
+
+<script src="js/calculation.js"></script>
 </body>
 </html>

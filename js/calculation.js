@@ -6,6 +6,7 @@ $.getScript("js/xlsx.full.min.js",function(){
 	oReq.responseType = "arraybuffer";
 	
 	oReq.onload = function(e) {
+		
   		var arraybuffer = oReq.response;
 
   		/* convert data to binary string */
@@ -82,6 +83,7 @@ $.getScript("js/xlsx.full.min.js",function(){
 				console.log(countGenerate);
 				if(countGenerate > 2){
 					document.getElementById("generate").disabled = true;
+					document.getElementById("optimize").disabled = false;
 				}
 				
 			}else{
@@ -208,16 +210,16 @@ function calSale(contribution_arr, baseline){
 function createTable(media_mix_arr, contribution_arr, variable_arr, sale_ori){
 	var table = document.getElementById("myTable");
 	var content = "";
-	content += "<tr><td>Impact</td>";
+	content += "<thead><tr><th> </th>";
 	for(var i = 0; i<variable_arr.length;i++){
-		content += "<td>" + variable_arr[i] + "</td>";
+		content += "<th>" + variable_arr[i] + "</th>";
 	}
-	content += "<td>Sales</td>";
+	content += "<th>Sales</th></thead>";
 	content += "</tr><tr><td>Media Mix</td>";
 	for(var i=0; i<media_mix_arr.length; i++){
 		content += "<td>" + Number(Math.round(media_mix_arr[i]*100 + 'e1') + 'e-1') + "&#37;</td>";
 	}
-	content += "</tr><tr><td>Contribution</td>";
+	content += "<td></td></tr><tr><td>Contribution</td>";
 	for(var i = 0; i<contribution_arr.length;i++){
 		content += "<td>" + Math.round(contribution_arr[i]) + "</td>";
 	}
@@ -240,6 +242,8 @@ function addInputArea(variable_arr){
 		var cell = row.insertCell(i+1);
 		cell.innerHTML = '<input type = "number" name="' +variable_arr[i]+'" id = "'+variable_arr[i]+'" value=""/>';
 	}
+	var emptycell = row.insertCell(variable_arr.length + 1);
+	emptycell.innerHTML = "";
 }
 
 function checkValue(variable_arr){
@@ -279,7 +283,8 @@ function addrow(media_mix_arr, contribution_arr, sale, sale_ori){
 		var cell = row1.insertCell(i+1);
 		cell.innerHTML = Number(Math.round(media_mix_arr[i]*100 + 'e1') + 'e-1') + "&#37;";
 	}
-	
+	var emptycell = row1.insertCell(contribution_arr.length + 1);
+	emptycell.innerHTML = "";
 	var row2 = table.insertRow(tr);
 	row2.insertCell(0).innerHTML = "Contribution";
 	for(var i=0 ; i<contribution_arr.length; i++){

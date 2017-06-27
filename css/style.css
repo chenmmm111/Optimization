@@ -1,0 +1,89 @@
+body {
+  font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+  font-weight: 300;
+  line-height: 1.42em;
+  color:#000000;
+}
+
+h1 {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 1.8em;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 500;
+	line-height: 26.4px;
+}
+table {
+	border-collapse: separate;
+} 
+input {
+    
+    background-color: #CCCCCC;
+    width:40%;
+    
+}
+.canvasjs-chart-credit {
+        display: none;     
+    }
+
+.table1 th {
+        background-color: #FFFFFF;
+        font-weight: bold;
+	  	font-size: 1.1em;
+  		text-align: left;
+  		color: #DB8086;
+}
+.table1 td:first-child {
+        color: #FB667A;
+        font-weight: bold;
+        font-size: 0.8em;
+        line-height: 0.8em;
+}
+
+/* Background-color of the odd rows */
+.table1 tr:nth-child(odd) {
+	  background-color: #CCCCCC;
+}
+
+/* Background-color of the even rows */
+.table1 tr:nth-child(even) {
+	  background-color: #F4F4F4;
+}
+.table1 td, .table1 th {
+	  	padding-bottom: 0.5%;
+	  	padding-top: 0.5%;
+  		padding-left:0.5%; 
+  		width:100px; 
+  		text-align: left;
+  		
+}
+.btn{
+	border: 1px solid #333;
+  		text-decoration: none;
+ 	 	text-transform: uppercase;
+  		font-size: 13px;
+  		background: #F9F9F9;
+  		color: #333;
+  		padding: 5px;
+  		border-bottom: solid 4px #333;
+  		transition: ease .1s;
+  		position: relative;
+  		top:0;
+  		border-radius: 4px;
+  		
+}
+.btn:hover {
+  border-bottom: solid 0px #333;
+  top: 4px;
+}
+.btn:disabled{
+	color: #F4F4F4;
+	border: 1px solid #F4F4F4;
+	border-bottom: solid 4px #F4F4F4;
+	pointer-events:none;
+}
+
+
+
+
+
