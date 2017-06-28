@@ -1,88 +1,73 @@
-<?php 
-	$vcount = count($_GET);
-	$rowinfo = $_GET["rowinfo"];
-	$para=[];
-	if($vcount > 0) {
-    foreach($_GET as $key => $value) {
-		if($key == "rowinfo"){
-			$rowinfo = $value;
-			}else{
-				array_push($para, $value);
-			}		
-		}
-	}
-	$paraJS = json_encode($para);
-	
-?>
 <script src="js/jquery-3.2.1.min.js" type = "text/javascript"></script>
+<script src="js/canvasjs.min.js" type = "text/javascript"></script>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Optimization Tool</title>
+<link rel = "stylesheet"
+   type = "text/css"
+   href = "css/style.css" />
 </head>
 
 <body>
-<h1>Publicis Media</h1>
-<h2>Media Mix Optimization</h2>
-<hr>
+<div>
+	<img src="icon/PublicisGreaterChina_308x57.png" alt="Publicis Media Logo" align="middle" />
+</div>
+ 
+<h1>Media Mix Optimization</h1>
+
 <div id="container">
-	<form action="#" method="GET">
-	<p><table id="myTable"></table></p>
-	<input type="hidden" name="rowinfo" id="rowinfo"/>
-	<input type="submit" value="GENERATE"/>
-		<button type="submit" id="optimize">OPTIMIZE</button>
+	<form action="#" method="GET" id = "myForm">
+	<p><table class="table1" id="myTable" style="width: 100%"></table></p>
+	<button type="button" id="optimize" class="btn">OPTIMIZE</button>
+	<button type="button" id="generate" class="btn">GENERATE</button>
+	
+	
 	</form>
 </div>
-<hr>
-<!--
-<div id="container">
-	<form action="#" method="POST">
-		<p>Input floating range of contributions:  &#177;<input type="number" name="floatrange" id="floatrange"/>&#37;</p>
-		<p><input type="submit" name="floatrangesubmit" id="floatrangesubmit" value="Optimize"/></p>
-	</form>
+<br>
+<br>
+<div style="width: 100%;">
+	<table id="displayTable" style="width:100%">
+	<thead>
+		<tr>
+			<th id="ori-text" style="width:17%" align="center"></th>
+			<th id="s1-text" style="width:17%" align="center"></th>
+			<th id="s2-text" style="width:17%" align="center"></th>
+			<th id="s3-text" style="width:17%" align="center"></th>
+			<th id="op-text" style="width:17%" align="center"></th>
+			<th id="bud-text" style="width:17%" align="center"></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td id="ori-sign" align="center" height="25"></td>
+			<td id="s1-sign" align="center" height="25"></td>
+			<td id="s2-sign" align="center" height="25"></td>
+			<td id="s3-sign" align="center" height="25"></td>
+			<td id="op-sign" align="center" height="25"></td>
+			<td id="bud-sign" align="center" height="25"></td>
+		</tr>
+		<tr>
+			<td id="ori-sale" align="center" height="25"></td>
+			<td id="s1-sale" align="center" height="25"></td>
+			<td id="s2-sale" align="center" height="25"></td>
+			<td id="s3-sale" align="center" height="25"></td>
+			<td id="op-sale" align="center" height="25"></td>
+			<td id="bud-sale"align="center" height="25"></td>
+		</tr>
+		<tr>
+			<td><div id="ori-graph" style="height: 300px; width: 100%;"></div></td>
+			<td><div id="s1-graph" style="height: 300px; width: 100%;"></div></td>
+			<td><div id="s2-graph" style="height: 300px; width: 100%;"></div></td>
+			<td><div id="s3-graph" style="height: 300px; width: 100%;"></div></td>
+			<td><div id="op-graph" style="height: 300px; width: 100%;"></div></td>
+			<td><div id="bud-graph" style="height: 300px; width: 100%;"></div></td>
+		</tr>
+	</tbody>		
+	</table>
 </div>
--->
-<script type="text/javascript">
-	var vcount = "<?php echo $vcount?>";
-	var rowinfo = URLdecode("<?php echo $rowinfo?>");
-	var paras = <?php echo $paraJS?>;
-	var sum = parseFloat(0);
-		
-		
-		for(var i = 0; i < paras.length;i++){
-			if(!paras[i]){
-				paras[i] = 0;
-			}
-			
-			paras[i] = parseFloat(paras[i]);
-			sum += paras[i];
-		}
-	
-	
-	// get table content
-	
-	function URLdecode(str) {
-        var ret = "";
-        for(var i=0;i<str.length;i++) {
-                var chr = str.charAt(i);
-                if(chr == "+") {
-                        ret += " ";
-                }else if(chr=="%") {
-                        var asc = str.substring(i+1,i+3);
-                        if(parseInt("0x"+asc)>0x7f) {
-                                ret += decodeURI("%"+ str.substring(i+1,i+9));
-                                i += 8;
-                        }else {
-                                ret += String.fromCharCode(parseInt("0x"+asc));
-                                i += 2;
-                        }
-                }else {
-                        ret += chr;
-                }
-        }
-        return ret;
-}
-</script>
-<script src="js/calculation1.js"></script>
+
+<script src="js/calculation.js"></script>
 </body>
 </html>

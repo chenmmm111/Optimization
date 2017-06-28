@@ -1,6 +1,8 @@
 $.getScript("js/xlsx.full.min.js",function(){
 	/* set up XMLHttpRequest */
 	var url = "upload.xlsx";
+	var charts = [];
+	var maxY = 0;
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", url, true);
 	oReq.responseType = "arraybuffer";
@@ -59,31 +61,45 @@ $.getScript("js/xlsx.full.min.js",function(){
 		createTable(media_mix_ori, contribution_ori, variable_arr, sale_ori);
 		addInputArea(variable_arr);
 		// add a column
-		drawAColumn("ori", "Original", "", contribution_ori, variable_arr);
+		
+		var tempchart = drawAColumn("ori", "Original", "", contribution_ori, variable_arr);
+		var tempmaxY = tempchart.axisY[0].get("maximum");
+		charts.push(tempchart);
+		if(tempmaxY > maxY){
+			maxY = tempmaxY;
+		}
+		changeY(charts, maxY);
+		
+		
 		var countGenerate = 0;
 		document.getElementById("generate").onclick = function(){
 			// check whether the values are set and equals to 100
+			
 			var input = checkValue(variable_arr);
 			if(input){
 				countGenerate++;
 				//reload original data
 				data_json_ori = XLSX.utils.sheet_to_json(worksheet1,{raw:true, header:1});
 				var new_data_arr = getNewOriData(data_json_ori, input, media_mix_ori);
-
-				var new_contri_arr = calContribution(new_data_arr, coefficient_json_ori, power_json_ori, lag_json_ori, variable_arr);
-				var new_sale = calSale(new_contri_arr, baseline);
-				addrow(input, new_contri_arr, new_sale, sale_ori);
-				//reset fields
-				document.getElementById("myForm").reset();
 				var text="Scenario "+countGenerate;
 				var type="s"+ countGenerate;
+				var new_contri_arr = calContribution(new_data_arr, coefficient_json_ori, power_json_ori, lag_json_ori, variable_arr);
+				var new_sale = calSale(new_contri_arr, baseline);
+				addrow(input, new_contri_arr, new_sale, sale_ori, text);
+				//reset fields
+				document.getElementById("myForm").reset();
+				
 				var change = new_sale - sale_ori;
 				//draw the column
-				drawAColumn(type, text, Math.round(change), contribution_ori, variable_arr);
-				console.log(countGenerate);
+				var tempchart = drawAColumn(type, text, Math.round(change), new_contri_arr, variable_arr);
+				var tempmaxY = tempchart.axisY[0].get("maximum");
+				charts.push(tempchart);
+				if(tempmaxY > maxY){
+					maxY = tempmaxY;
+				}
+				changeY(charts, maxY);
 				if(countGenerate > 2){
 					document.getElementById("generate").disabled = true;
-					document.getElementById("optimize").disabled = false;
 				}
 				
 			}else{
@@ -120,7 +136,7 @@ $.getScript("js/xlsx.full.min.js",function(){
 				}
 				while(round<5000);
 			
-				console.log(optimize_media_mix,optimize_sale,optimize_contri);
+				
 				for(var i=0; i<optimize_media_mix.length;i++){
 					plus_media_mix.push(optimize_media_mix[i]);
 				}
@@ -128,10 +144,25 @@ $.getScript("js/xlsx.full.min.js",function(){
 				plus_contri = calContribution(plus_data_arr, coefficient_json_ori, power_json_ori, lag_json_ori, variable_arr);
 				plus_sale = calSale(plus_contri, baseline);
 				
-				addrow(optimize_media_mix, optimize_contri, optimize_sale, sale_ori);
-				addrow(plus_media_mix, plus_contri, plus_sale, sale_ori);
-				drawAColumn("op", "Optimize", Math.round(optimize_sale - sale_ori), optimize_contri, variable_arr);
-				drawAColumn("bud", "BudgetPlus", Math.round(plus_sale - sale_ori), plus_contri, variable_arr);
+				addrow(optimize_media_mix, optimize_contri, optimize_sale, sale_ori, "Optimize");
+				addrow(plus_media_mix, plus_contri, plus_sale, sale_ori, "BudgetPlus");
+				var tempchart1 = drawAColumn("op", "Optimize", Math.round(optimize_sale - sale_ori), optimize_contri, variable_arr);				
+				charts.push(tempchart1);
+				var tempmaxY1 = tempchart1.axisY[0].get("maximum");
+				var tempchart2 = drawAColumn("bud", "BudgetPlus", Math.round(plus_sale - sale_ori), plus_contri, variable_arr);
+				charts.push(tempchart2);
+				var tempmaxY2 = tempchart2.axisY[0].get("maximum");
+				if(tempmaxY2>tempmaxY1){
+					if(tempmaxY2 > maxY){
+						maxY = tempmaxY2;	
+					}
+				}else{
+					if(tempmaxY1 > maxY){
+						maxY = tempmaxY1;
+					}
+				}
+				
+				changeY(charts, maxY);
 				
 				
 			}else{
@@ -219,7 +250,7 @@ function createTable(media_mix_arr, contribution_arr, variable_arr, sale_ori){
 	for(var i=0; i<media_mix_arr.length; i++){
 		content += "<td>" + Number(Math.round(media_mix_arr[i]*100 + 'e1') + 'e-1') + "&#37;</td>";
 	}
-	content += "<td></td></tr><tr><td>Contribution</td>";
+	content += "<td>Original</td></tr><tr><td>Contribution</td>";
 	for(var i = 0; i<contribution_arr.length;i++){
 		content += "<td>" + Math.round(contribution_arr[i]) + "</td>";
 	}
@@ -274,7 +305,7 @@ function getNewOriData(ori_data_arr, new_media_mix_arr, old_media_mix_arr){
 	return new_data_arr;
 }
 
-function addrow(media_mix_arr, contribution_arr, sale, sale_ori){
+function addrow(media_mix_arr, contribution_arr, sale, sale_ori, text){
 	var table = document.getElementById("myTable");
 	var tr = document.getElementsByTagName("tr").length - 4;
 	var row1 = table.insertRow(tr-1);
@@ -284,7 +315,7 @@ function addrow(media_mix_arr, contribution_arr, sale, sale_ori){
 		cell.innerHTML = Number(Math.round(media_mix_arr[i]*100 + 'e1') + 'e-1') + "&#37;";
 	}
 	var emptycell = row1.insertCell(contribution_arr.length + 1);
-	emptycell.innerHTML = "";
+	emptycell.innerHTML = text;
 	var row2 = table.insertRow(tr);
 	row2.insertCell(0).innerHTML = "Contribution";
 	for(var i=0 ; i<contribution_arr.length; i++){
@@ -294,10 +325,14 @@ function addrow(media_mix_arr, contribution_arr, sale, sale_ori){
 	// add sale
 	var sign = "";
 	var change = Number(Math.round((sale-sale_ori)*100/sale_ori + 'e2') + 'e-2');
+	var salecell = row2.insertCell(contribution_arr.length+1);
 	if(change>0){
 		sign = "+";
+		salecell.className = "pos";
+	}else if(change<0){
+		salecell.className = "neg";
 	}
-	row2.insertCell(contribution_arr.length+1).innerHTML = Math.round(sale) + "(" + sign + change + "&#37;)";
+	salecell.innerHTML = Math.round(sale) + "(" + sign + change + "&#37;)";
 }
 
 function getRandomMediaMix(media_mix_ori_arr, varplus){
@@ -369,25 +404,18 @@ function drawAColumn(type, text, change, contribution_arr, variable_arr){
 			        shared: true,
 			        //animationEnabled: true
 			  },
+			theme: "theme1", 
+			dataPointWidth: 80,
+			height:300,
 			data:data
 	};
 	var chart = new CanvasJS.Chart(elements[3],para);
 	chart.render();
+	return chart;
 }
 
-//var data = [];
-//var dps1 = [];
-//var dps2 = [];
-//var variable1 = "v1";
-//var sale1 = 1000;
-//var variable2 = "v2";
-//var sale2 = 100;
-//dps1.push({y:sale1,lable:variable1});
-//dps2.push({y:sale2,lable:variable2});
-//data.push({type:"stackedColumn",dataPoints:dps1});
-//data.push({type:"stackedColumn",dataPoints:dps2});
-//var para = {data:data};
-//
-//var c1 = new CanvasJS.Chart("s1-graph",para);
-//c1.render();
-	
+function changeY(charts, maxY){
+	for(var i=0; i<charts.length; i++){
+		charts[i].axisY[0].set("maximum",maxY);
+	}
+}

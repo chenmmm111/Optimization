@@ -40,6 +40,10 @@ input {
         line-height: 0.8em;
 }
 
+.table1 td:last-child{
+        font-weight: bold;
+}
+
 /* Background-color of the odd rows */
 .table1 tr:nth-child(odd) {
 	  background-color: #CCCCCC;
@@ -70,6 +74,7 @@ input {
   		position: relative;
   		top:0;
   		border-radius: 4px;
+  		float: right;
   		
 }
 .btn:hover {
@@ -82,7 +87,21 @@ input {
 	border-bottom: solid 4px #F4F4F4;
 	pointer-events:none;
 }
-
+.pos{
+	color: red;
+}
+.neg{
+	color:green;
+}
+.logo{
+	text-align:center
+}
+.logo img{
+	max-width:25em;
+	display:inline-block;
+	margin:auto;
+	width:100%
+}
 
 
 
