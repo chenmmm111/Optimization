@@ -12,9 +12,9 @@
 <body>
 <div>
 	<img src="icon/PublicisGreaterChina_308x57.png" alt="Publicis Media Logo" align="middle" />
+	<h1>Media Mix Optimization</h1>
 </div>
- 
-<h1>Media Mix Optimization</h1>
+
 
 <div id="container">
 	<form action="#" method="GET" id = "myForm">
